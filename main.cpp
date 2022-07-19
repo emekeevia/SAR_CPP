@@ -7,14 +7,32 @@
 #include <vector>
 #include <cmath>
 #include <array>
+#include <fstream>
+#include <sstream>
 #include "extra_tools.h"
 
 
-void read_file(){
+void read_file(vector<vector<std::complex<double>>>& v){
     //Test_Image.mat
+    std::string line;
+    vector<complex<double>> temp;
+    stringstream ss;
+
+    std::ifstream in("Test_Image.txt"); // окрываем файл для чтения
+    if (in.is_open()){
+        while (getline(in, line))
+        {
+            ss << line;
+            complex<double> ch;
+            while(ss>>ch){
+
+            }
+        }
+    }
 }
 void SAR(){
     vector<vector<std::complex<double>>> Raw_data;
+    read_file(Raw_data);
     size_t size_azimuth = Raw_data.size();
     size_t size_range = Raw_data[0].size();
 
