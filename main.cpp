@@ -1,10 +1,12 @@
 #include <iostream>
-#include <fftw.h>
+#include <fftw3.h>
 #include <stdio.h>
-#include <complex>
+#include <complex.h>
 #include <tgmath.h>
+#include <stdlib.h>
 #include <vector>
 #include <cmath>
+#include <array>
 #include "extra_tools.h"
 
 
@@ -28,9 +30,9 @@ void SAR(){
 
     //RANGE DOMAIN
     // Basic definitions
-    vector<std::complex<double>> range_chirp(size_range); //empty vector to be filled with chirp values
-    vector<std::complex<double>> RANGE_CHIRP(size_range);
-    vector<std::complex<double>> tau = fill_up(-tau_p/2, tau_p/2, 1/fs);  // time axis in range
+    vector<complex<double>> range_chirp(size_range); //empty vector to be filled with chirp values
+    //vector<std::complex<double>> RANGE_CHIRP(size_range);
+    vector<complex<double>> tau = fill_up(-tau_p/2, tau_p/2, 1/fs);  // time axis in range
     //vector<std::complex<double>> omega = fill_up(-fs/2, fs/2, 1/tau_p);  // frequency axis in range
 
     //Define chirp in range
@@ -44,31 +46,42 @@ void SAR(){
 
     //Position chirp in range vector (centered)
     // --> used for correlation procedure
-    size_t index_start = ceil(((size_range-size_chirp_r)/2.0)-1.0);
-    size_t index_end = size_chirp_r+ceil(((size_range-size_chirp_r)/2.0)-2.0);
-    //range_chirp[0, index_start:index_end+1] = ra_chirp_temp;
+    ra_chirp_temp.insert(ra_chirp_temp.begin(),size_range - size_chirp_r,0);
+    range_chirp = ra_chirp_temp;
 
     // Transform vector in frequency domain (Fourier transform)
     fftw_plan plan_f;
-    plan_f = fftw_create_plan(size_range, FFTW_FORWARD, FFTW_ESTIMATE); //making draft plan
-    fftw_one(plan_f, range_chirp, RANGE_CHIRP); // Fourier Transform
+    vector<complex<double>> RANGE_CHIRP(size_range);
+
+
+    plan_f = fftw_plan_dft_1d(size_range, reinterpret_cast<fftw_complex*>(&range_chirp),
+                              reinterpret_cast<fftw_complex*>(&RANGE_CHIRP), FFTW_FORWARD, FFTW_ESTIMATE); //making draft plan
+    fftw_execute(plan_f); // Fourier Transform
     fftw_destroy_plan(plan_f);
 
 
     // Define chirp for correlation
     // --> conjugate complex of signal chirp
-    //CON_RANGE_CHIRP = np.conjugate(RANGE_CHIRP)
+    vector<complex<double>> CON_RANGE_CHIRP(size_range);
+    conjugate(CON_RANGE_CHIRP, RANGE_CHIRP);
+
+    vector<vector<complex<double>>>processed(size_azimuth, vector<complex<double>>(size_range));
 
 
     for(size_t k1 = 0; k1 < size_azimuth;k1++) {
-        fftw_complex vek_in = Raw_data[k1];  // Select row in range
-        fftw_complex vek_out[size_range];
-        fftw_plan plan = fftw_create_plan(size_range, FFTW_FORWARD, FFTW_ESTIMATE); //making draft plan
-        fftw_one(plan, vek_in, vek_out); // Fourier Transform
-        auto CORR = vek_out * CON_RANGE_CHIRP;  // Multiply vectors
-        if_vek = np.fft.ifft(CORR);  // Inverse Fourier Transform
-        if_vek_sort = np.fft.ifftshift(if_vek);// Sorting after FFT
-        processed [k1] = if_vek_sort;  // Store row in matrix
+        size_t size = Raw_data[k1].size();
+        vector<complex<double>> vek_out(size_range);
+        fftw_plan plan = fftw_plan_dft_1d(size_range, reinterpret_cast<fftw_complex*>(&Raw_data[k1]),
+                                           reinterpret_cast<fftw_complex*>(&vek_out), FFTW_FORWARD, FFTW_ESTIMATE); //making draft plan
+        fftw_execute(plan); // Fourier Transform
+        vector<complex<double>> CORR = vek_out * CON_RANGE_CHIRP;  // Multiply vectors
+
+        vector<complex<double>> if_vek(size_range);
+        plan = fftw_plan_dft_1d(size_range, reinterpret_cast<fftw_complex*>(&CORR),
+                                           reinterpret_cast<fftw_complex*>(&if_vek), FFTW_BACKWARD, FFTW_ESTIMATE);// Inverse Fourier Transform
+
+        iFFTshift(if_vek);// Sorting after FFT
+        processed [k1] = if_vek;  // Store row in matrix
         fftw_destroy_plan(plan);
     }
 }
