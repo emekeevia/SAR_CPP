@@ -82,26 +82,26 @@ Vector operator/(const T& v, D a){
 	return temp;
 }
 
-template<typename T, typename D>
-T operator*(const T& v, D a){
-	T temp;
-	for(size_t i = 0; i < 3;i++){
-		temp[i] = v[i] * a;
-	}
-	return temp;
-}
+//template<typename T, typename D>
+//T operator*(const T& v, D a){
+//	T temp;
+//	for(size_t i = 0; i < 3;i++){
+//		temp[i] = v[i] * a;
+//	}
+//	return temp;
+//}
 
-template<typename T>
-T operator*(const T& v1, const T& v2){
-    T temp;
-    if(v1.size() != v2.size()){
-        throw("Not equal size!");
-    }
-    for(size_t i = 0; i < v1.size();i++){
-        temp[i] = v1[i]*v2[i];
-    }
-    return temp;
-}
+//template<typename T>
+//T operator*(const T& v1, const T& v2){
+//    T temp;
+//    if(v1.size() != v2.size()){
+//        throw("Not equal size!");
+//    }
+//    for(size_t i = 0; i < v1.size();i++){
+//        temp[i] = v1[i]*v2[i];
+//    }
+//    return temp;
+//}
 
 
 template<typename T>
