@@ -2,24 +2,39 @@
 #include <fftw.h>
 #include <complex.h>
 #include <vector>
+#include <cmath>
+#include "extra_tools.h"
 
 
 void read_file(){
     //Test_Image.mat
 }
 void SAR(){
-    vector<vector<complex<double>>> Raw_data;
+    vector<vector<std::complex<double>>> Raw_data;
     size_t size_azimuth = Raw_data.size();
     size_t size_range = Raw_data[0].size();
+
     vector<complex<double>> vek;
-    auto fs = 18.962468*10e6;  //Range Sampling Frequency [Hz]
-    auto K_r = 4.18989015*10e11;     // FM Rate Range Chirp [1/s^2] --> up-chirp
-    auto tau_p = 37.12*10e-6;       // Chirp duration [s]
-    auto V = 7098.0194;                // Effective satellite velocity [m/s]
-    auto Lambda = 0.05656;            // Length of carrier wave [m]
-    auto R_0 = 852358.15;              // Range to center of antenna footprint [m]
-    auto ta = 0.6;                     // Aperture time [s]
-    auto prf = 1679.902;               // Pulse Repitition Frequency [Hz]
+    double fs = 18.962468*10e6;  //Range Sampling Frequency [Hz]
+    double K_r = 4.18989015*10e11;     // FM Rate Range Chirp [1/s^2] --> up-chirp
+    double tau_p = 37.12*10e-6;       // Chirp duration [s]
+    double V = 7098.0194;                // Effective satellite velocity [m/s]
+    double Lambda = 0.05656;            // Length of carrier wave [m]
+    double R_0 = 852358.15;              // Range to center of antenna footprint [m]
+    double ta = 0.6;                     // Aperture time [s]
+    double prf = 1679.902;               // Pulse Repitition Frequency [Hz]
+
+    // Basic definitions
+    vector<std::complex<double>> range_chirp(size_range); //empty vector to be filled with chirp values
+    vector<std::complex<double>> tau = fill_up(-tau_p/2, tau_p/2, 1/fs);  // time axis in range
+    vector<std::complex<double>> omega = fill_up(-fs/2, fs/2, 1/tau_p);  // frequency axis in range
+
+#   //Define chirp in range
+    vector<std::complex<double>> phase = (tau*tau)*M_PI*K_r*I;
+    vector<std::complex<double>> ra_chirp_temp = np.exp(phase);
+
+#   //Get size of chirp
+    size_chirp_r = len(tau)
 
     for(size_t k1 = 0; k1 < size_azimuth;k1++) {
         fftw_complex vek_in = Raw_data[k1];  // Select row in range
