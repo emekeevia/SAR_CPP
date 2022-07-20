@@ -32,6 +32,44 @@ void iFFTshift(vector<complex<double>>& v){
     size_t N = v.size();
     rotate(v.begin(),v.begin() + N/2,v.end());
 }
+std::vector<std::vector<std::complex<double>>> read_file(){
+    //Test_Image.mat
+    std::vector<std::vector<std::complex<double>>> v;
+    std::string line;
+    vector<complex<double>> temp;
+    stringstream ss;
+    complex<double> ch;
+
+
+    std::ifstream in("Test_Image.txt"); // окрываем файл для чтения
+    if (in.is_open()){
+        while (getline(in, line))
+        {
+            ss << line;
+            while(ss>>ch){
+                temp.push_back(ch);
+            }
+            v.push_back(temp);
+            temp.clear();
+        }
+    }
+    return v;
+}
+
+void Write_in_file(vector<vector<complex<double>>>& v){
+    std::ofstream out;          // поток для записи
+    out.open("SAR_out.txt");
+    size_t azimuth_size = v.size();
+    size_t range_size = v[0].size();
+
+    for(size_t i = azimuth_size - 1; i >= 0;i--){
+        for(size_t j = 0; j < range_size;j++){
+            out << abs(v[i][j]) << ' ';
+        }
+        out << '\n';
+    }
+    out.close();
+}
 
 
 

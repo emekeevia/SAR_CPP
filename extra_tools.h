@@ -8,6 +8,7 @@
 #include <fftw3.h>
 #include <complex>
 #include <algorithm>
+#include <fstream>
 
 using namespace std;
 
@@ -22,13 +23,15 @@ vector<complex<double>> operator*(const vector<complex<double>>& v1, const vecto
 
 void iFFTshift(vector<complex<double>>& v);
 
+std::vector<std::vector<std::complex<double>>> read_file();
 
+void Write_in_file(vector<vector<complex<double>>>& v);
 
 
 template<typename T>
 T operator+(T v1, T v2){
 	if(v1.size() != v2.size()){
-		throw("Not equal size!");
+		throw('Not equal size!');
 	}
 	size_t count = v2.size();
 	T temp;
