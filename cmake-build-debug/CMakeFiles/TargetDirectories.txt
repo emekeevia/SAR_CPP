@@ -1,3 +1,4 @@
+/home/ivan/CLionProjects/SAR_CPP/cmake-build-debug/CMakeFiles/extra.dir
 /home/ivan/CLionProjects/SAR_CPP/cmake-build-debug/CMakeFiles/untitled.dir
 /home/ivan/CLionProjects/SAR_CPP/cmake-build-debug/CMakeFiles/edit_cache.dir
 /home/ivan/CLionProjects/SAR_CPP/cmake-build-debug/CMakeFiles/rebuild_cache.dir

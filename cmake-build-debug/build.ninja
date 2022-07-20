@@ -41,13 +41,44 @@ include CMakeFiles/rules.ninja
 
 cmake_ninja_workdir = /home/ivan/CLionProjects/SAR_CPP/cmake-build-debug/
 # =============================================================================
+# Object build statements for STATIC_LIBRARY target extra
+
+
+#############################################
+# Order-only phony target for extra
+
+build cmake_object_order_depends_target_extra: phony || CMakeFiles/extra.dir
+
+build CMakeFiles/extra.dir/extra_tools.cpp.o: CXX_COMPILER__extra_Debug /home/ivan/CLionProjects/SAR_CPP/extra_tools.cpp || cmake_object_order_depends_target_extra
+  DEP_FILE = CMakeFiles/extra.dir/extra_tools.cpp.o.d
+  FLAGS = -g
+  OBJECT_DIR = CMakeFiles/extra.dir
+  OBJECT_FILE_DIR = CMakeFiles/extra.dir
+
+
+# =============================================================================
+# Link build statements for STATIC_LIBRARY target extra
+
+
+#############################################
+# Link the static library libextra.a
+
+build libextra.a: CXX_STATIC_LIBRARY_LINKER__extra_Debug CMakeFiles/extra.dir/extra_tools.cpp.o
+  LANGUAGE_COMPILE_FLAGS = -g
+  OBJECT_DIR = CMakeFiles/extra.dir
+  POST_BUILD = :
+  PRE_LINK = :
+  TARGET_FILE = libextra.a
+  TARGET_PDB = extra.a.dbg
+
+# =============================================================================
 # Object build statements for EXECUTABLE target untitled
 
 
 #############################################
 # Order-only phony target for untitled
 
-build cmake_object_order_depends_target_untitled: phony || CMakeFiles/untitled.dir
+build cmake_object_order_depends_target_untitled: phony || cmake_object_order_depends_target_extra
 
 build CMakeFiles/untitled.dir/main.cpp.o: CXX_COMPILER__untitled_Debug /home/ivan/CLionProjects/SAR_CPP/main.cpp || cmake_object_order_depends_target_untitled
   DEP_FILE = CMakeFiles/untitled.dir/main.cpp.o.d
@@ -63,8 +94,9 @@ build CMakeFiles/untitled.dir/main.cpp.o: CXX_COMPILER__untitled_Debug /home/iva
 #############################################
 # Link the executable untitled
 
-build untitled: CXX_EXECUTABLE_LINKER__untitled_Debug CMakeFiles/untitled.dir/main.cpp.o
+build untitled: CXX_EXECUTABLE_LINKER__untitled_Debug CMakeFiles/untitled.dir/main.cpp.o | libextra.a || libextra.a
   FLAGS = -g
+  LINK_LIBRARIES = libextra.a
   OBJECT_DIR = CMakeFiles/untitled.dir
   POST_BUILD = :
   PRE_LINK = :
@@ -98,6 +130,8 @@ build rebuild_cache: phony CMakeFiles/rebuild_cache.util
 # =============================================================================
 # Target aliases.
 
+build extra: phony libextra.a
+
 # =============================================================================
 # Folder targets.
 
@@ -106,7 +140,7 @@ build rebuild_cache: phony CMakeFiles/rebuild_cache.util
 #############################################
 # Folder: /home/ivan/CLionProjects/SAR_CPP/cmake-build-debug
 
-build all: phony untitled
+build all: phony libextra.a untitled
 
 # =============================================================================
 # Built-in targets

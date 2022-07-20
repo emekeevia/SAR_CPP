@@ -156,7 +156,7 @@ void SAR(){
         }
         fftw_destroy_plan(plan_a);
     }
-
+    Write_in_file(processed);
 }
 
 int main() {

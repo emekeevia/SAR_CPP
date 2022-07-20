@@ -31,7 +31,7 @@ void Write_in_file(vector<vector<complex<double>>>& v);
 template<typename T>
 T operator+(T v1, T v2){
 	if(v1.size() != v2.size()){
-		throw('Not equal size!');
+		throw -1;
 	}
 	size_t count = v2.size();
 	T temp;
@@ -44,7 +44,7 @@ T operator+(T v1, T v2){
 template<typename T>
 vector<T> operator-(vector<T>& v1, vector<T>& v2){
 	if(v1.size() != v2.size()){
-		throw("Not equal size!");
+		throw -1;
 	}
 	size_t count = v1.size();
 	T temp(count);
