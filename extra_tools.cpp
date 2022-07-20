@@ -35,19 +35,27 @@ void iFFTshift(vector<complex<double>>& v){
 std::vector<std::vector<std::complex<double>>> read_file(){
     //Test_Image.mat
     std::vector<std::vector<std::complex<double>>> v;
-    std::string line;
+    std::string line, elem;
     vector<complex<double>> temp;
-    stringstream ss;
+    stringstream ss, micro_ss;
     complex<double> ch;
 
 
+
     std::ifstream in("Test_Image.txt"); // окрываем файл для чтения
+    //std::cout << in.is_open() << endl;
     if (in.is_open()){
+        //std::cout << "Check!" << endl;
         while (getline(in, line))
         {
             ss << line;
-            while(ss>>ch){
+            while(ss>>elem){
+                micro_ss << elem;
+                micro_ss.get();
+                micro_ss >> ch;
+                micro_ss.clear();
                 temp.push_back(ch);
+                std::cout << ch << endl;
             }
             v.push_back(temp);
             temp.clear();

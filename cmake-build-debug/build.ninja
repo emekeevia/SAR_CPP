@@ -94,9 +94,9 @@ build CMakeFiles/untitled.dir/main.cpp.o: CXX_COMPILER__untitled_Debug /home/iva
 #############################################
 # Link the executable untitled
 
-build untitled: CXX_EXECUTABLE_LINKER__untitled_Debug CMakeFiles/untitled.dir/main.cpp.o | libextra.a || libextra.a
+build untitled: CXX_EXECUTABLE_LINKER__untitled_Debug CMakeFiles/untitled.dir/main.cpp.o | /usr/lib/x86_64-linux-gnu/libfftw3.so /usr/lib/x86_64-linux-gnu/libm.so libextra.a || libextra.a
   FLAGS = -g
-  LINK_LIBRARIES = libextra.a
+  LINK_LIBRARIES = /usr/lib/x86_64-linux-gnu/libfftw3.so  -lm  libextra.a
   OBJECT_DIR = CMakeFiles/untitled.dir
   POST_BUILD = :
   PRE_LINK = :
