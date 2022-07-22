@@ -69,9 +69,10 @@ void Write_in_file(vector<vector<complex<double>>>& v){
     size_t azimuth_size = v.size();
     size_t range_size = v[0].size();
 
-    for(size_t i = azimuth_size - 1; i >= 0;i--){
+    for(size_t i = 0; i < azimuth_size;i++){
         for(size_t j = 0; j < range_size;j++){
             out << abs(v[i][j]) << ' ';
+            //std::cout << v[i][j] << std::endl;
         }
         out << '\n';
     }

@@ -19,9 +19,9 @@ void SAR(){
     int size_range = static_cast<int>(Raw_data[0].size());
 
     vector<complex<double>> vek;
-    double fs = 18.962468*10e6;  //Range Sampling Frequency [Hz]
-    double K_r = 4.18989015*10e11;     // FM Rate Range Chirp [1/s^2] --> up-chirp
-    double tau_p = 37.12*10e-6;       // Chirp duration [s]
+    double fs = 18.962468e+6;  //Range Sampling Frequency [Hz]
+    double K_r = 4.18989015e+11;     // FM Rate Range Chirp [1/s^2] --> up-chirp
+    double tau_p = 37.12e-6;       // Chirp duration [s]
     double V = 7098.0194;                // Effective satellite velocity [m/s]
     double Lambda = 0.05656;            // Length of carrier wave [m]
     double R_0 = 852358.15;              // Range to center of antenna footprint [m]
@@ -50,12 +50,13 @@ void SAR(){
     range_chirp = ra_chirp_temp;
 
     // Transform vector in frequency domain (Fourier transform)
-    fftw_plan plan_f;
     vector<complex<double>> RANGE_CHIRP(size_range);
 
 
-    plan_f = fftw_plan_dft_1d(size_range, reinterpret_cast<fftw_complex*>(&range_chirp),
-                              reinterpret_cast<fftw_complex*>(&RANGE_CHIRP), FFTW_FORWARD, FFTW_ESTIMATE); //making draft plan
+    fftw_plan plan_f = fftw_plan_dft_1d(size_range, (fftw_complex*) &range_chirp[0],
+                                        (fftw_complex*) &RANGE_CHIRP[0], FFTW_FORWARD, FFTW_ESTIMATE); //making draft plan
+
+
     fftw_execute(plan_f); // Fourier Transform
     fftw_destroy_plan(plan_f);
 
@@ -100,8 +101,8 @@ void SAR(){
     vector<complex<double>> AZIMUTH_CHIRP(size_azimuth);
 
 
-    plan = fftw_plan_dft_1d(size_azimuth, reinterpret_cast<fftw_complex*>(&azimuth_chirp),
-                            reinterpret_cast<fftw_complex*>(&AZIMUTH_CHIRP), FFTW_FORWARD, FFTW_ESTIMATE); //making draft plan
+    plan = fftw_plan_dft_1d(size_azimuth, (fftw_complex*) &azimuth_chirp[0],
+                            (fftw_complex*)&AZIMUTH_CHIRP[0], FFTW_FORWARD, FFTW_ESTIMATE); //making draft plan
     fftw_execute(plan); // Fourier Transform
     fftw_destroy_plan(plan);
 
@@ -116,46 +117,57 @@ void SAR(){
 
     //Focusing
     //1)Range compression
+    vector<complex<double>> vek_out(size_range);
+    vector<complex<double>> vek_in(size_range);
+    vector<complex<double>> if_vek(size_range);
+    vector<complex<double>> CORR(size_range);
+    fftw_plan plan_r;
     for(size_t k1 = 0; k1 < size_azimuth;k1++) {
-
-        vector<complex<double>> vek_out(size_range);
-        fftw_plan plan_r = fftw_plan_dft_1d(size_range, reinterpret_cast<fftw_complex*>(&Raw_data[k1]),
-                                          reinterpret_cast<fftw_complex*>(&vek_out), FFTW_FORWARD, FFTW_ESTIMATE); //making draft plan
+        vek_in= Raw_data[k1];
+        plan_r = fftw_plan_dft_1d(size_range, (fftw_complex*) &vek_in[0],
+                                            (fftw_complex*) &vek_out[0], FFTW_FORWARD, FFTW_ESTIMATE); //making draft plan
         fftw_execute(plan_r); // Fourier Transform
-        vector<complex<double>> CORR = vek_out * CON_RANGE_CHIRP;  // Multiply vectors
 
-        vector<complex<double>> if_vek(size_range);
-        plan_r = fftw_plan_dft_1d(size_range, reinterpret_cast<fftw_complex*>(&CORR),
-                                reinterpret_cast<fftw_complex*>(&if_vek), FFTW_BACKWARD, FFTW_ESTIMATE);// Inverse Fourier Transform
+        CORR = vek_out * CON_RANGE_CHIRP;  // Multiply vectors
+
+
+        plan_r = fftw_plan_dft_1d(size_range, (fftw_complex*) &CORR[0],
+                                  (fftw_complex*) &if_vek[0], FFTW_BACKWARD, FFTW_ESTIMATE);// Inverse Fourier Transform
         fftw_execute(plan_r);
 
         iFFTshift(if_vek);// Sorting after FFT
         processed [k1] = if_vek;  // Store row in matrix
-        fftw_destroy_plan(plan_r);
     }
+    fftw_destroy_plan(plan_r);
     //2)Azimuth compression
+    vector<complex<double>> vek2(size_azimuth);// = processed[:, k2];  // Select row in azimuth
+    vector<complex<double>> VEK2(size_azimuth);
+    vector<complex<double>> if_vek2(size_azimuth);
+    vector<complex<double>> CORR2(size_azimuth);
+    fftw_plan plan_a;
     for(size_t k2 = 0; k2 < size_range;k2++) {
-        vector<complex<double>> vek2(size_azimuth);// = processed[:, k2];  // Select row in azimuth
+
         for(size_t i = 0; i < size_azimuth;i++){
             vek2[i] = processed[i][k2];
         }
-        vector<complex<double>> VEK2(size_azimuth);
-        fftw_plan plan_a = fftw_plan_dft_1d(size_azimuth, reinterpret_cast<fftw_complex*>(&vek2),
-                                          reinterpret_cast<fftw_complex*>(&VEK2), FFTW_FORWARD, FFTW_ESTIMATE);//making draft plan
-        fftw_execute(plan_a); // Fourier Transform
-        vector<complex<double>> CORR2 = VEK2*CON_AZIMUTH_CHIRP;
 
-        vector<complex<double>> if_vek2(size_azimuth);
-        plan_a = fftw_plan_dft_1d(size_range, reinterpret_cast<fftw_complex*>(&CORR2),
-                                reinterpret_cast<fftw_complex*>(&if_vek2), FFTW_BACKWARD, FFTW_ESTIMATE);// Inverse Fourier Transform
+        plan_a = fftw_plan_dft_1d(size_azimuth, (fftw_complex*) &vek2[0],
+                                            (fftw_complex*) &VEK2[0], FFTW_FORWARD, FFTW_ESTIMATE);//making draft plan
+        fftw_execute(plan_a); // Fourier Transform
+        CORR2 = VEK2*CON_AZIMUTH_CHIRP;
+
+
+        plan_a = fftw_plan_dft_1d(size_azimuth, (fftw_complex*) &CORR2[0],
+                                  (fftw_complex*) &if_vek2[0], FFTW_BACKWARD, FFTW_ESTIMATE);// Inverse Fourier Transform
         fftw_execute(plan_a);
 
         iFFTshift(if_vek2);// Sorting after FFT
         for(size_t i = 0; i < size_azimuth;i++){
             processed[i][k2] = if_vek2[i];
         }
-        fftw_destroy_plan(plan_a);
+
     }
+    fftw_destroy_plan(plan_a);
     Write_in_file(processed);
 }
 
