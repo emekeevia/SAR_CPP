@@ -36,17 +36,16 @@ std::vector<std::vector<std::complex<double>>> read_file(){
     //Test_Image.mat
     std::vector<std::vector<std::complex<double>>> v;
     std::string line, elem;
-    vector<complex<double>> temp;
-    stringstream ss, micro_ss;
-    complex<double> ch;
+    std::vector<std::complex<double>> temp;
+    std::stringstream ss, micro_ss;
+    std::complex<double> ch;
 
 
 
-    std::ifstream in("Test_Image.txt"); // окрываем файл для чтения
-    //std::cout << in.is_open() << endl;
-    if (in.is_open()){
-        //std::cout << "Check!" << endl;
-        while (getline(in, line))
+    std::ifstream in_; // окрываем файл для чтения
+    in_.open("/home/ivan/CLionProjects/SAR_CPP/Refreshed_test.txt", std::ios::in);
+    if (in_.is_open()){
+        while (getline(in_, line))
         {
             ss << line;
             while(ss>>elem){
@@ -55,12 +54,12 @@ std::vector<std::vector<std::complex<double>>> read_file(){
                 micro_ss >> ch;
                 micro_ss.clear();
                 temp.push_back(ch);
-                std::cout << ch << endl;
             }
             v.push_back(temp);
             temp.clear();
         }
     }
+    in_.close();
     return v;
 }
 
