@@ -1,13 +1,8 @@
-
 #include <fftw3.h>
-
 #include <complex.h>
 #include <complex>
-
-
 #include <vector>
 #include <cmath>
-
 #include "extra_tools.h"
 
 
@@ -85,7 +80,7 @@ void SAR(){
     size_t size_chirp_a = t.size();
     vector<std::complex<double>> az_chirp_temp (size_chirp_a);
     for(size_t i = 0;i < size_chirp_a;i++){
-        ra_chirp_temp[i] = exp(t[i]*t[i]*M_PI*K_a*static_cast<complex<double>>(I));
+        az_chirp_temp[i] = exp(t[i]*t[i]*M_PI*K_a*static_cast<complex<double>>(I));
     }
 
 
