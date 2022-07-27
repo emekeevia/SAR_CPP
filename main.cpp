@@ -1,6 +1,6 @@
-#include <fftw3.h>
 #include <complex.h>
 #include <complex>
+#include <fftw3.h>
 #include <vector>
 #include <cmath>
 #include "extra_tools.h"
@@ -10,10 +10,12 @@
 void SAR(){
     vector<vector<std::complex<double>>> Raw_data = read_file();
 
+    // Get image size
     int size_azimuth = static_cast<int>(Raw_data.size());
     int size_range = static_cast<int>(Raw_data[0].size());
 
     vector<complex<double>> vek;
+    // B.) Sensor parameters (ERS satellite)
     double fs = 18.962468e+6;  //Range Sampling Frequency [Hz]
     double K_r = 4.18989015e+11;     // FM Rate Range Chirp [1/s^2] --> up-chirp
     double tau_p = 37.12e-6;       // Chirp duration [s]
@@ -24,7 +26,9 @@ void SAR(){
     double prf = 1679.902;               // Pulse Repitition Frequency [Hz]
 
     //RANGE DOMAIN
+    //(D.) Define correlation chirp in range
     // Basic definitions
+
     vector<complex<double>> range_chirp(size_range); //empty vector to be filled with chirp values
     vector<complex<double>> tau = fill_up(-tau_p/2, tau_p/2, 1/fs);  // time axis in range
 
@@ -32,17 +36,18 @@ void SAR(){
     //Define chirp in range
     //Get size of chirp
     size_t size_chirp_r = tau.size();
-    vector<std::complex<double>> ra_chirp_temp (size_chirp_r);
+    size_t start = (size_range - size_chirp_r)/2 - 1;
+
     for(size_t i = 0;i < size_chirp_r;i++){
-        ra_chirp_temp[i] = exp(tau[i]*tau[i]*M_PI*K_r*static_cast<complex<double>>(I));
+        range_chirp[i+start] = exp(tau[i]*tau[i]*M_PI*K_r*static_cast<complex<double>>(I));
     }
+
 
 
 
     //Position chirp in range vector (centered)
     // --> used for correlation procedure
-    ra_chirp_temp.insert(ra_chirp_temp.begin(),size_range - size_chirp_r,0);
-    range_chirp = ra_chirp_temp;
+
 
     // Transform vector in frequency domain (Fourier transform)
     vector<complex<double>> RANGE_CHIRP(size_range);
@@ -56,10 +61,12 @@ void SAR(){
     fftw_destroy_plan(plan_f);
 
 
+
     // Define chirp for correlation
     // --> conjugate complex of signal chirp
     vector<complex<double>> CON_RANGE_CHIRP(size_range);
     conjugate(CON_RANGE_CHIRP, RANGE_CHIRP);
+
 
     //-------------------------------------------------------------------------------------------------------
 
@@ -78,9 +85,10 @@ void SAR(){
     // Define chirp in azimuth
     // Get size of chirp
     size_t size_chirp_a = t.size();
-    vector<std::complex<double>> az_chirp_temp (size_chirp_a);
+    size_t start2 = (size_azimuth - size_chirp_a)/2 - 1;
+
     for(size_t i = 0;i < size_chirp_a;i++){
-        az_chirp_temp[i] = exp(t[i]*t[i]*M_PI*K_a*static_cast<complex<double>>(I));
+        azimuth_chirp[i+start2] = exp(t[i]*t[i]*M_PI*K_a*static_cast<complex<double>>(I));
     }
 
 
@@ -88,8 +96,7 @@ void SAR(){
 
     // Position chirp in azimuth vector (centered)
     // --> used for correlation procedure
-    az_chirp_temp.insert(az_chirp_temp.begin(),size_azimuth - size_chirp_a,0);
-    azimuth_chirp = az_chirp_temp;
+
 
     // Transform vector in frequency domain (Fourier transform)
     fftw_plan plan;
@@ -100,7 +107,6 @@ void SAR(){
                             (fftw_complex*)&AZIMUTH_CHIRP[0], FFTW_FORWARD, FFTW_ESTIMATE); //making draft plan
     fftw_execute(plan); // Fourier Transform
     fftw_destroy_plan(plan);
-
     // Define chirp for correlation
     // --> conjugate complex of signal chirp
     vector<complex<double>> CON_AZIMUTH_CHIRP(size_azimuth);
@@ -118,18 +124,17 @@ void SAR(){
     vector<complex<double>> CORR(size_range);
     fftw_plan plan_r;
     for(size_t k1 = 0; k1 < size_azimuth;k1++) {
-        vek_in= Raw_data[k1];
+        vek_in = Raw_data[k1];
         plan_r = fftw_plan_dft_1d(size_range, (fftw_complex*) &vek_in[0],
                                             (fftw_complex*) &vek_out[0], FFTW_FORWARD, FFTW_ESTIMATE); //making draft plan
         fftw_execute(plan_r); // Fourier Transform
-
         CORR = vek_out * CON_RANGE_CHIRP;  // Multiply vectors
-
-
         plan_r = fftw_plan_dft_1d(size_range, (fftw_complex*) &CORR[0],
                                   (fftw_complex*) &if_vek[0], FFTW_BACKWARD, FFTW_ESTIMATE);// Inverse Fourier Transform
         fftw_execute(plan_r);
-
+        if(k1 == 0){
+            std::cout << if_vek << endl;//if_vek не совпадает с версией в python
+        }
         iFFTshift(if_vek);// Sorting after FFT
         processed [k1] = if_vek;  // Store row in matrix
     }

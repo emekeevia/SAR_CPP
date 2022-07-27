@@ -39,6 +39,10 @@ std::vector<std::vector<std::complex<double>>> read_file(){
     std::vector<std::complex<double>> temp;
     std::stringstream ss, micro_ss;
     std::complex<double> ch;
+    double real, im;
+    char sign;
+    //int count = 0;
+
 
 
 
@@ -50,9 +54,22 @@ std::vector<std::vector<std::complex<double>>> read_file(){
             ss << line;
             while(ss>>elem){
                 micro_ss << elem;
-                micro_ss.get();
-                micro_ss >> ch;
-                micro_ss.clear();
+                micro_ss >> real;
+                micro_ss.get(sign);
+                micro_ss >> im;
+                if(sign == '-') {
+                    im *= -1;
+                }
+                micro_ss.str(std::string());
+                ch = complex<double>(real, im);
+//                if(count < 2){
+//                    count++;
+//                    std::cout << elem << endl;
+//                    std::cout << real << endl;
+//                    std::cout << sign << endl;
+//                    std::cout << im << endl;
+//                    std::cout << "'" <<micro_ss.str() << "'" <<endl;
+//                }
                 temp.push_back(ch);
             }
             v.push_back(temp);
@@ -71,8 +88,11 @@ void Write_in_file(vector<vector<complex<double>>>& v){
 
     for(size_t i = 0; i < azimuth_size;i++){
         for(size_t j = 0; j < range_size;j++){
-            out << abs(v[i][j]) << ' ';
-            //std::cout << v[i][j] << std::endl;
+            if(j != range_size - 1){
+                out << abs(v[i][j]) << ' ';
+            }else {
+                out << abs(v[i][j]);
+            }
         }
         out << '\n';
     }
