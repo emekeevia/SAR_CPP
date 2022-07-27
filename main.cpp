@@ -122,6 +122,7 @@ void SAR(){
     vector<complex<double>> vek_in(size_range);
     vector<complex<double>> if_vek(size_range);
     vector<complex<double>> CORR(size_range);
+    vector<complex<double>> norm_r(size_range, complex<double>(1.0 / size_range));
     fftw_plan plan_r;
     for(size_t k1 = 0; k1 < size_azimuth;k1++) {
         vek_in = Raw_data[k1];
@@ -132,9 +133,7 @@ void SAR(){
         plan_r = fftw_plan_dft_1d(size_range, (fftw_complex*) &CORR[0],
                                   (fftw_complex*) &if_vek[0], FFTW_BACKWARD, FFTW_ESTIMATE);// Inverse Fourier Transform
         fftw_execute(plan_r);
-        if(k1 == 0){
-            std::cout << if_vek << endl;//if_vek не совпадает с версией в python
-        }
+        if_vek = if_vek * norm_r;
         iFFTshift(if_vek);// Sorting after FFT
         processed [k1] = if_vek;  // Store row in matrix
     }
@@ -144,23 +143,20 @@ void SAR(){
     vector<complex<double>> VEK2(size_azimuth);
     vector<complex<double>> if_vek2(size_azimuth);
     vector<complex<double>> CORR2(size_azimuth);
+    vector<complex<double>> norm_a(size_azimuth, complex<double>(1.0 / size_azimuth));
     fftw_plan plan_a;
     for(size_t k2 = 0; k2 < size_range;k2++) {
-
         for(size_t i = 0; i < size_azimuth;i++){
             vek2[i] = processed[i][k2];
         }
-
         plan_a = fftw_plan_dft_1d(size_azimuth, (fftw_complex*) &vek2[0],
                                             (fftw_complex*) &VEK2[0], FFTW_FORWARD, FFTW_ESTIMATE);//making draft plan
         fftw_execute(plan_a); // Fourier Transform
         CORR2 = VEK2*CON_AZIMUTH_CHIRP;
-
-
         plan_a = fftw_plan_dft_1d(size_azimuth, (fftw_complex*) &CORR2[0],
                                   (fftw_complex*) &if_vek2[0], FFTW_BACKWARD, FFTW_ESTIMATE);// Inverse Fourier Transform
         fftw_execute(plan_a);
-
+        if_vek2 = if_vek2 * norm_a;
         iFFTshift(if_vek2);// Sorting after FFT
         for(size_t i = 0; i < size_azimuth;i++){
             processed[i][k2] = if_vek2[i];

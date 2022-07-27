@@ -37,11 +37,9 @@ std::vector<std::vector<std::complex<double>>> read_file(){
     std::vector<std::vector<std::complex<double>>> v;
     std::string line, elem;
     std::vector<std::complex<double>> temp;
-    std::stringstream ss, micro_ss;
     std::complex<double> ch;
     double real, im;
     char sign;
-    //int count = 0;
 
 
 
@@ -49,10 +47,10 @@ std::vector<std::vector<std::complex<double>>> read_file(){
     std::ifstream in_; // окрываем файл для чтения
     in_.open("/home/ivan/CLionProjects/SAR_CPP/Refreshed_test.txt", std::ios::in);
     if (in_.is_open()){
-        while (getline(in_, line))
-        {
+        while (getline(in_, line)){
+            std::stringstream ss, micro_ss;
             ss << line;
-            while(ss>>elem){
+            while(ss >> elem){
                 micro_ss << elem;
                 micro_ss >> real;
                 micro_ss.get(sign);
@@ -62,14 +60,6 @@ std::vector<std::vector<std::complex<double>>> read_file(){
                 }
                 micro_ss.str(std::string());
                 ch = complex<double>(real, im);
-//                if(count < 2){
-//                    count++;
-//                    std::cout << elem << endl;
-//                    std::cout << real << endl;
-//                    std::cout << sign << endl;
-//                    std::cout << im << endl;
-//                    std::cout << "'" <<micro_ss.str() << "'" <<endl;
-//                }
                 temp.push_back(ch);
             }
             v.push_back(temp);
