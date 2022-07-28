@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD 14)
 
 #set(CMAKE_C_FLAGS   "-lm -lfftw3")
 
-set(SOURCE_LIB extra_tools.cpp)			# Тоже самое, но для библиотеки
+set(SOURCE_LIB extra_tools.cpp base_algorithm.cpp base_algorithm.h)			# Тоже самое, но для библиотеки
 
 set(SOURCE_EXE main.cpp)		# Установка переменной со списком исходников для исполняемого файла
 
@@ -32,4 +32,6 @@ if(UNIX AND NOT WIN32)
     list(APPEND FFTW_LIBRARIES "${FFTW_libm_LIBRARY}")
 endif()
 
-target_link_libraries(untitled ${FFTW_LIBRARIES} extra)
+#target_link_libraries(untitled ${FFTW_LIBRARIES} extra)
+target_link_libraries(extra ${FFTW_LIBRARIES})
+target_link_libraries(untitled extra)
