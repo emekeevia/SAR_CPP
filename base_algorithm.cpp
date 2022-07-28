@@ -1,6 +1,6 @@
 #include "base_algorithm.h"
 
-vector<complex<double>> range_chirp_for_correlation(int size_range, double fs, double K_r,double tau_p){
+vector<complex<double>> range_chirp_for_correlation(int size_range, double fs, double K_r,double tau_p, bool approx){
     //(D.) Define correlation chirp in range
     // Basic definitions
     vector<complex<double>> range_chirp(size_range); //empty vector to be filled with chirp values
@@ -14,20 +14,25 @@ vector<complex<double>> range_chirp_for_correlation(int size_range, double fs, d
     int count;
 
     for(size_t i = 0;i < size_chirp_r;i++){
-        temp = tau[i]*tau[i] * K_r;//в единицах PI
-        count = static_cast<int>(temp) / 2;
-        temp -= count * 2.0;
-        if(temp <= 0.5) {
-            range_chirp[i+start] = complex<double>(1.0,1.0);
-        }else if(temp > 0.5 && temp <= 1.0){
-            range_chirp[i+start] = complex<double>(-1.0,1.0);
-        }else if(temp > 1.0 && temp <= 1.5){
-            range_chirp[i+start] = complex<double>(-1.0,-1.0);
+        if(approx){
+            temp = tau[i]*tau[i] * K_r;//в единицах PI
+            count = static_cast<int>(temp) / 2;
+            temp -= count * 2.0;
+            if(temp <= 0.5) {
+                range_chirp[i+start] = complex<double>(1.0,1.0);
+            }else if(temp > 0.5 && temp <= 1.0){
+                range_chirp[i+start] = complex<double>(-1.0,1.0);
+            }else if(temp > 1.0 && temp <= 1.5){
+                range_chirp[i+start] = complex<double>(-1.0,-1.0);
+            }else{
+                range_chirp[i+start] = complex<double>(1.0,-1.0);
+            }
+            range_chirp[i+start] /= sqrt(2.0);
         }else{
-            range_chirp[i+start] = complex<double>(1.0,-1.0);
+            range_chirp[i+start] = exp(tau[i]*tau[i]*M_PI*K_r*static_cast<complex<double>>(I));
         }
-        //range_chirp[i+start] /= sqrt(2.0);
-        //range_chirp[i+start] = exp(tau[i]*tau[i]*M_PI*K_r*static_cast<complex<double>>(I));
+
+
     }
 
     //Position chirp in range vector (centered)
@@ -48,7 +53,7 @@ vector<complex<double>> range_chirp_for_correlation(int size_range, double fs, d
     return CON_RANGE_CHIRP;
 }
 
-vector<complex<double>> azimuth_chirp_for_correlation(int size_azimuth,  double V, double Lambda, double R_0, double ta, double prf){
+vector<complex<double>> azimuth_chirp_for_correlation(int size_azimuth,  double V, double Lambda, double R_0, double ta, double prf, bool approx){
     // E.) Define correlation chirp in azimuth
 
     // Basic definitions
@@ -68,20 +73,25 @@ vector<complex<double>> azimuth_chirp_for_correlation(int size_azimuth,  double 
     int count;
 
     for(size_t i = 0;i < size_chirp_a;i++){
-//        temp = t[i]*t[i] * K_a;//в единицах PI
-//        count = static_cast<int>(temp) / 2;
-//        temp -= count * 2.0;
-//        if(temp <= 0.5) {
-//            azimuth_chirp[i+start2] = complex<double>(1.0,1.0);
-//        }else if(temp > 0.5 && temp <= 1.0){
-//            azimuth_chirp[i+start2] = complex<double>(-1.0,1.0);
-//        }else if(temp > 1.0 && temp <= 1.5){
-//            azimuth_chirp[i+start2] = complex<double>(-1.0,-1.0);
-//        }else{
-//            azimuth_chirp[i+start2] = complex<double>(1.0,-1.0);
-//        }
-        //azimuth_chirp[i+start2] /= sqrt(2.0);
-        azimuth_chirp[i+start2] = exp(t[i]*t[i]*M_PI*K_a*static_cast<complex<double>>(I));
+        if(approx){
+            temp = t[i]*t[i] * K_a;//в единицах PI
+            count = static_cast<int>(temp) / 2;
+            temp -= count * 2.0;
+            if(temp >= -0.5) {
+                azimuth_chirp[i+start2] = complex<double>(1.0,-1.0);
+            }else if(temp < -0.5 && temp >= -1.0){
+                azimuth_chirp[i+start2] = complex<double>(-1.0,-1.0);
+            }else if(temp < -1.0 && temp >= -1.5){
+                azimuth_chirp[i+start2] = complex<double>(-1.0,1.0);
+            }else{
+                azimuth_chirp[i+start2] = complex<double>(1.0,1.0);
+            }
+            azimuth_chirp[i+start2] /= sqrt(2.0);
+        }else{
+            azimuth_chirp[i+start2] = exp(t[i]*t[i]*M_PI*K_a*static_cast<complex<double>>(I));
+        }
+
+
     }
 
 
@@ -128,14 +138,14 @@ void SAR(){
     //RANGE DOMAIN
 
     vector<complex<double>> CON_RANGE_CHIRP(size_range);
-    CON_RANGE_CHIRP = range_chirp_for_correlation(size_range, fs, K_r, tau_p);
+    CON_RANGE_CHIRP = range_chirp_for_correlation(size_range, fs, K_r, tau_p, true);
 
     //-------------------------------------------------------------------------------------------------------
 
     //AZIMUTH DOMAIN
 
     vector<complex<double>> CON_AZIMUTH_CHIRP(size_azimuth);
-    CON_AZIMUTH_CHIRP = azimuth_chirp_for_correlation(size_azimuth, V, Lambda, R_0, ta, prf);
+    CON_AZIMUTH_CHIRP = azimuth_chirp_for_correlation(size_azimuth, V, Lambda, R_0, ta, prf, true);
 
     //--------------------------------------------------------------------------------------------------------
 
