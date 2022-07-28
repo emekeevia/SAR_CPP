@@ -4,15 +4,30 @@ vector<complex<double>> range_chirp_for_correlation(int size_range, double fs, d
     //(D.) Define correlation chirp in range
     // Basic definitions
     vector<complex<double>> range_chirp(size_range); //empty vector to be filled with chirp values
-    vector<complex<double>> tau = fill_up(-tau_p/2, tau_p/2, 1/fs);  // time axis in range
+    vector<double> tau = fill_up(-tau_p/2, tau_p/2, 1/fs);  // time axis in range
     //Define chirp in range
     //Get size of chirp
 
     size_t size_chirp_r = tau.size();
     size_t start = (size_range - size_chirp_r)/2 - 1;
+    double temp;
+    int count;
 
     for(size_t i = 0;i < size_chirp_r;i++){
-        range_chirp[i+start] = exp(tau[i]*tau[i]*M_PI*K_r*static_cast<complex<double>>(I));
+        temp = tau[i]*tau[i] * K_r;//в единицах PI
+        count = static_cast<int>(temp) / 2;
+        temp -= count * 2.0;
+        if(temp <= 0.5) {
+            range_chirp[i+start] = complex<double>(1.0,1.0);
+        }else if(temp > 0.5 && temp <= 1.0){
+            range_chirp[i+start] = complex<double>(-1.0,1.0);
+        }else if(temp > 1.0 && temp <= 1.5){
+            range_chirp[i+start] = complex<double>(-1.0,-1.0);
+        }else{
+            range_chirp[i+start] = complex<double>(1.0,-1.0);
+        }
+        //range_chirp[i+start] /= sqrt(2.0);
+        //range_chirp[i+start] = exp(tau[i]*tau[i]*M_PI*K_r*static_cast<complex<double>>(I));
     }
 
     //Position chirp in range vector (centered)
@@ -38,7 +53,7 @@ vector<complex<double>> azimuth_chirp_for_correlation(int size_azimuth,  double 
 
     // Basic definitions
     vector<complex<double>> azimuth_chirp(size_azimuth);  // empty vector to be filled with chirp values
-    vector<complex<double>> t = fill_up(-ta/2, ta/2, 1/prf);// time axis in azimuth
+    vector<double> t = fill_up(-ta/2, ta/2, 1/prf);// time axis in azimuth
 
 
     // FM Rate Azimuth Chirp
@@ -49,7 +64,23 @@ vector<complex<double>> azimuth_chirp_for_correlation(int size_azimuth,  double 
     size_t size_chirp_a = t.size();
     size_t start2 = (size_azimuth - size_chirp_a)/2 - 1;
 
+    double temp;
+    int count;
+
     for(size_t i = 0;i < size_chirp_a;i++){
+//        temp = t[i]*t[i] * K_a;//в единицах PI
+//        count = static_cast<int>(temp) / 2;
+//        temp -= count * 2.0;
+//        if(temp <= 0.5) {
+//            azimuth_chirp[i+start2] = complex<double>(1.0,1.0);
+//        }else if(temp > 0.5 && temp <= 1.0){
+//            azimuth_chirp[i+start2] = complex<double>(-1.0,1.0);
+//        }else if(temp > 1.0 && temp <= 1.5){
+//            azimuth_chirp[i+start2] = complex<double>(-1.0,-1.0);
+//        }else{
+//            azimuth_chirp[i+start2] = complex<double>(1.0,-1.0);
+//        }
+        //azimuth_chirp[i+start2] /= sqrt(2.0);
         azimuth_chirp[i+start2] = exp(t[i]*t[i]*M_PI*K_a*static_cast<complex<double>>(I));
     }
 

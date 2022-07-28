@@ -1,8 +1,8 @@
 #include "extra_tools.h"
 
 
-vector<complex<double>> fill_up(const double& start,const double& finish, const double& step){
-    vector<complex<double>> mass;
+vector<double> fill_up(const double& start,const double& finish, const double& step){
+    vector<double> mass;
     for(double temp = start; temp < finish;temp+=step){
         mass.push_back(temp);
     }

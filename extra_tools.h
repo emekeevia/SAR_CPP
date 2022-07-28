@@ -14,7 +14,7 @@ using namespace std;
 
 
 
-vector<complex<double>> fill_up(const double& start,const double& finish, const double& step);
+vector<double> fill_up(const double& start,const double& finish, const double& step);
 
 
 void conjugate(vector<complex<double>>& sopr, const vector<complex<double>>& orig);
