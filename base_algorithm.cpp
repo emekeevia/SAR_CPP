@@ -12,7 +12,7 @@ vector<complex<double>> range_chirp_for_correlation(int size_range, double fs, d
     size_t start = (size_range - size_chirp_r)/2 - 1;
     double temp;
     int count;
-
+    double sqrt_two = sqrt(2.0);
     for(size_t i = 0;i < size_chirp_r;i++){
         if(approx){
             temp = tau[i]*tau[i] * K_r;//в единицах PI
@@ -27,7 +27,7 @@ vector<complex<double>> range_chirp_for_correlation(int size_range, double fs, d
             }else{
                 range_chirp[i+start] = complex<double>(1.0,-1.0);
             }
-            range_chirp[i+start] /= sqrt(2.0);
+            range_chirp[i+start] /= sqrt_two;
         }else{
             range_chirp[i+start] = exp(tau[i]*tau[i]*M_PI*K_r*static_cast<complex<double>>(I));
         }
@@ -71,7 +71,7 @@ vector<complex<double>> azimuth_chirp_for_correlation(int size_azimuth,  double 
 
     double temp;
     int count;
-
+    double sqrt_two = sqrt(2.0);
     for(size_t i = 0;i < size_chirp_a;i++){
         if(approx){
             temp = t[i]*t[i] * K_a;//в единицах PI
@@ -86,7 +86,7 @@ vector<complex<double>> azimuth_chirp_for_correlation(int size_azimuth,  double 
             }else{
                 azimuth_chirp[i+start2] = complex<double>(1.0,1.0);
             }
-            azimuth_chirp[i+start2] /= sqrt(2.0);
+            azimuth_chirp[i+start2] /= sqrt_two;
         }else{
             azimuth_chirp[i+start2] = exp(t[i]*t[i]*M_PI*K_a*static_cast<complex<double>>(I));
         }
@@ -118,8 +118,11 @@ vector<complex<double>> azimuth_chirp_for_correlation(int size_azimuth,  double 
 }
 
 void SAR(){
-    vector<vector<std::complex<double>>> Raw_data = read_file();
-
+    auto start = std::chrono::steady_clock::now();
+    vector<vector<std::complex<double>>> Raw_data = read_file(false);
+    auto end = std::chrono::steady_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::seconds>(end - start);
+    std::cout <<"Reading: "<< duration.count() << endl;
     // Get image size
     int size_azimuth = static_cast<int>(Raw_data.size());
     int size_range = static_cast<int>(Raw_data[0].size());
@@ -199,5 +202,5 @@ void SAR(){
 
     }
     fftw_destroy_plan(plan_a);
-    Write_in_file(processed);
+    //Write_in_file(processed);
 }

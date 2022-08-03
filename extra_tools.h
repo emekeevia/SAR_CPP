@@ -23,7 +23,7 @@ vector<complex<double>> operator*(const vector<complex<double>>& v1, const vecto
 
 void iFFTshift(vector<complex<double>>& v);
 
-std::vector<std::vector<std::complex<double>>> read_file();
+std::vector<std::vector<std::complex<double>>> read_file(bool pen_writing);
 
 void Write_in_file(vector<vector<complex<double>>>& v);
 

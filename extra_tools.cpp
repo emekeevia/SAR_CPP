@@ -32,7 +32,7 @@ void iFFTshift(vector<complex<double>>& v){
     size_t N = v.size();
     rotate(v.begin(),v.begin() + N/2,v.end());
 }
-std::vector<std::vector<std::complex<double>>> read_file(){
+std::vector<std::vector<std::complex<double>>> read_file(bool pen_writing){
     //Test_Image.mat
     std::vector<std::vector<std::complex<double>>> v;
     std::string line, elem;
@@ -44,35 +44,43 @@ std::vector<std::vector<std::complex<double>>> read_file(){
 
 
 
-    std::ifstream in_; // окрываем файл для чтения
-    in_.open("/home/ivan/Загрузки/E2_10001_STD_L0_F285.raw", std::ios::in);
-    if (in_.is_open()){
-        while (getline(in_, line)){
-            std::stringstream ss, micro_ss;
-            ss << line;
-            while(ss >> elem){
-                micro_ss << elem;
-                micro_ss >> real;
-                micro_ss.get(sign);
-                micro_ss >> im;
-                if(sign == '-') {
-                    im *= -1;
+    for(size_t i = 0; i < 2;i++) {
+        std::ifstream in_; // окрываем файл для чтения
+        in_.open("/home/ivan/CLionProjects/SAR_CPP/E2_10001_STD_L0_F285_for_cpp_"+ to_string(i)+"_part.txt", std::ios::in);
+        if (in_.is_open()) {
+            while (getline(in_, line)) {
+                std::stringstream ss, micro_ss;
+                ss << line;
+                while (ss >> elem) {
+
+                    if (pen_writing) {
+                        micro_ss << elem;
+                        micro_ss >> real;
+                        micro_ss.get(sign);
+                        micro_ss >> im;
+                        if (sign == '-') {
+                            im *= -1;
+                        }
+                        micro_ss.str(std::string());
+                        ch = complex<double>(real, im);
+                    } else {
+                        micro_ss << elem;
+                        micro_ss >> ch;
+                    }
+                    temp.push_back(ch);
                 }
-                micro_ss.str(std::string());
-                ch = complex<double>(real, im);
-                temp.push_back(ch);
+                v.push_back(temp);
+                temp.clear();
             }
-            v.push_back(temp);
-            temp.clear();
         }
+        in_.close();
     }
-    in_.close();
     return v;
 }
 
 void Write_in_file(vector<vector<complex<double>>>& v){
     std::ofstream out;          // поток для записи
-    out.open("Real_SAR_out.txt");
+    out.open("Real_SAR_out_f_part.txt");
     size_t azimuth_size = v.size();
     size_t range_size = v[0].size();
 
