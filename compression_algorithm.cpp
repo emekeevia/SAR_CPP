@@ -157,7 +157,7 @@ void SAR(){
     //Focusing
     //1)Range compression
     vector<complex<double>> vek(size_range);
-    vector<complex<double>> norm_r(size_range, complex<double>(1.0 / size_range));
+    complex<double> norm_r = complex<double>(1.0 / size_range);
     fftw_plan plan_r;
     for(size_t k1 = 0; k1 < size_azimuth;k1++) {
         vek = Raw_data[k1];
@@ -175,7 +175,7 @@ void SAR(){
     fftw_destroy_plan(plan_r);
     //2)Azimuth compression
     vector<complex<double>> vek2(size_azimuth);// = processed[:, k2];  // Select row in azimuth
-    vector<complex<double>> norm_a(size_azimuth, complex<double>(1.0 / size_azimuth));
+    complex<double> norm_a = complex<double>(1.0 / size_azimuth);
     fftw_plan plan_a;
     for(size_t k2 = 0; k2 < size_range;k2++) {
         for(size_t i = 0; i < size_azimuth;i++){

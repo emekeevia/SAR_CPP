@@ -67,14 +67,15 @@ array<T,l> operator-(array<T,l>& v1, array<T,l>& v2){
 
 
 
-//template<typename T, typename D>
-//T operator*(const T& v, D a){
-//	T temp;
-//	for(size_t i = 0; i < 3;i++){
-//		temp[i] = v[i] * a;
-//	}
-//	return temp;
-//}
+template<typename T, typename D>
+T operator*(const T& v, D a){
+    size_t size = v.size();
+	T temp(size);
+	for(size_t i = 0; i < size;i++){
+		temp[i] = v[i] * a;
+	}
+	return temp;
+}
 
 //template<typename T>
 //T operator*(const T& v1, const T& v2){
