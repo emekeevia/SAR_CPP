@@ -1,7 +1,7 @@
 #include <iostream>
 #include <chrono>
 
-#include "base_algorithm.h"
+#include "compression_algorithm.h"
 
 int main() {
     auto start = std::chrono::steady_clock::now();

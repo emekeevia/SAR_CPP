@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD 14)
 
 #set(CMAKE_C_FLAGS   "-lm -lfftw3")
 
-set(SOURCE_LIB extra_tools.cpp base_algorithm.cpp base_algorithm.h)			# Тоже самое, но для библиотеки
+set(SOURCE_LIB extra_tools.cpp compression_algorithm.cpp compression_algorithm.h)			# Тоже самое, но для библиотеки
 
 set(SOURCE_EXE main.cpp)		# Установка переменной со списком исходников для исполняемого файла
 

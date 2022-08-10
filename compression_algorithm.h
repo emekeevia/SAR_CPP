@@ -5,6 +5,7 @@
 #include <fftw3.h>
 #include <vector>
 #include <cmath>
+#include <string>
 #include <chrono>
 #include "extra_tools.h"
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <string>
 #include <cmath>
 #include <array>
 #include <sstream>
@@ -25,7 +26,7 @@ void iFFTshift(vector<complex<double>>& v);
 
 std::vector<std::vector<std::complex<double>>> read_file(bool pen_writing);
 
-void Write_in_file(vector<vector<complex<double>>>& v);
+void Write_in_file(vector<vector<complex<double>>>& v, string file_name);
 
 
 template<typename T>
